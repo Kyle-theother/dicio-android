@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.app.PendingIntent.CanceledException
 import android.app.SearchManager
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.util.Log
@@ -96,9 +97,18 @@ class SttPopupActivity : BaseActivity() {
                 speechExtras.getBundle(RecognizerIntent.EXTRA_RESULTS_PENDINGINTENT_BUNDLE)
                     ?.let { intent.putExtras(it) }
             }
-            val resultIntent = speechExtras.getParcelable<PendingIntent>(
-                RecognizerIntent.EXTRA_RESULTS_PENDINGINTENT
-            )
+            val resultIntent: PendingIntent? =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    speechExtras.getParcelable(
+                        RecognizerIntent.EXTRA_RESULTS_PENDINGINTENT,
+                        PendingIntent::class.java
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    speechExtras.getParcelable<PendingIntent>(
+                        RecognizerIntent.EXTRA_RESULTS_PENDINGINTENT
+                    )
+                }
             try {
                 resultIntent?.send(this, resultCode, intent)
             } catch (e: CanceledException) {
