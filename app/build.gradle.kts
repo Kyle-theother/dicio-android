@@ -1,4 +1,3 @@
-import org.gradle.configurationcache.extensions.capitalized
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -104,7 +103,7 @@ protobuf {
 androidComponents {
     onVariants(selector().all()) { variant ->
         afterEvaluate {
-            val capName = variant.name.capitalized()
+            val capName = variant.name.replaceFirstChar { it.uppercaseChar() }
             tasks.getByName<KotlinCompile>("ksp${capName}Kotlin") {
                 setSource(tasks.getByName("generate${capName}Proto").outputs)
             }
